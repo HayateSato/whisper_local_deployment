@@ -1,0 +1,20 @@
+# Core dependencies for Whisper German Transcription
+# Install with: pip install -r requirements.txt
+
+# OpenAI Whisper for transcription
+openai-whisper==20231117
+
+# PyTorch with CUDA 12.1 support (for GPU acceleration)
+# Note: Install separately using the command below for proper CUDA support
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# FFmpeg Python bindings
+ffmpeg-python>=0.2.0
+
+# Additional dependencies (usually installed automatically with whisper)
+numpy>=1.23.0
+tiktoken>=0.3.0
+more-itertools>=9.0.0

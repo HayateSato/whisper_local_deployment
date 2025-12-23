@@ -1,0 +1,21 @@
+Step 1: Install Chocolatey
+Open PowerShell as Administrator and run:
+
+    powershellSet-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+Close and reopen PowerShell as Administrator after installation.
+
+
+Step 2: Install FFmpeg
+
+    powershellchoco install ffmpeg -y
+
+Close and reopen your terminal after installation.
+
+
+
+Step 3: Install Python Dependencies
+    
+    bashpip install --upgrade pip
+    pip install openai-whisper torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+    pip install ffmpeg-python
