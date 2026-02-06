@@ -2,7 +2,7 @@
 # Install with: pip install -r requirements.txt
 
 # OpenAI Whisper for transcription
-openai-whisper==20231117
+openai-whisper
 
 # PyTorch with CUDA 12.1 support (for GPU acceleration)
 # Note: Install separately using the command below for proper CUDA support
