@@ -1,51 +1,91 @@
-import whisper
+# ============================================================
+# faster-whisper implementation (active)
+# ============================================================
+from faster_whisper import WhisperModel
 import os
 import torch
 from pathlib import Path
 from datetime import timedelta
 import time
 
+# ============================================================
+# openai-whisper implementation (commented out)
+# ============================================================
+# import whisper
+#
+# def transcribe_with_timestamps(model, audio_path, interval_seconds=300):
+#     """Transcribe audio with timestamp annotations (openai-whisper)"""
+#     print(f"Transcribing: {audio_path}")
+#     result = model.transcribe(
+#         str(audio_path),
+#         language="de",    # de --> Force German language
+                            # if language is omitted, Whisper auto-detects the language per ~30-second chunk.
+                            # Caveats to be aware of:Detection happens per chunk (~30s), not per sentence — so if someone switches language mid-chunk, accuracy may drop
+#         word_timestamps=True,
+#         verbose=False
+#     )
+#     transcription_lines = []
+#     last_timestamp_mark = 0
+#     for segment in result['segments']:
+#         segment_start = segment['start']
+#         segment_text = segment['text'].strip()
+#         if segment_start >= last_timestamp_mark + interval_seconds:
+#             timestamp_str = format_timestamp(segment_start)
+#             transcription_lines.append(f"\n{timestamp_str}\n")
+#             last_timestamp_mark = segment_start
+#         transcription_lines.append(segment_text)
+#     return ' '.join(transcription_lines)
+#
+# # Load model (openai-whisper):
+# # model = whisper.load_model(model_size, device=device)
+# ============================================================
+
+
 def format_timestamp(seconds):
     """Convert seconds to [HH:MM:SS] format"""
     td = timedelta(seconds=int(seconds))
     return f"[{str(td)}]"
 
+
 def transcribe_with_timestamps(model, audio_path, interval_seconds=300):
     """
     Transcribe audio with timestamp annotations
-    
+
     Args:
-        model: Loaded Whisper model
+        model: Loaded faster-whisper WhisperModel
         audio_path: Path to audio file
         interval_seconds: Interval for timestamp annotations (default 300 = 5 minutes)
     """
     print(f"Transcribing: {audio_path}")
-    
+
     # Transcribe with word-level timestamps
-    result = model.transcribe(
+    # No language specified — auto-detects per segment (handles German/English mixing)
+    segments, info = model.transcribe(
         str(audio_path),
-        language="de",  # Force German language
         word_timestamps=True,
-        verbose=False
+        beam_size=5,
     )
-    
+
+    print(f"    Detected language: {info.language} (probability: {info.language_probability:.2f})")
+
     # Build transcription with interval timestamps
     transcription_lines = []
     last_timestamp_mark = 0
-    
-    for segment in result['segments']:
-        segment_start = segment['start']
-        segment_text = segment['text'].strip()
-        
+
+    for segment in segments:
+        segment_start = segment.start
+        segment_text = segment.text.strip()
+
         # Add timestamp marker if we've crossed an interval
         if segment_start >= last_timestamp_mark + interval_seconds:
             timestamp_str = format_timestamp(segment_start)
             transcription_lines.append(f"\n{timestamp_str}\n")
             last_timestamp_mark = segment_start
-        
+
         transcription_lines.append(segment_text)
-    
+
     return ' '.join(transcription_lines)
+
 
 def process_directory(base_path, output_base_path, model_size="large-v3", timestamp_interval=300, file_extensions=None):
     """
@@ -64,7 +104,8 @@ def process_directory(base_path, output_base_path, model_size="large-v3", timest
 
     # Check GPU availability
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"Using device: {device}")
+    compute_type = "float16" if device == "cuda" else "int8"
+    print(f"Using device: {device} | compute_type: {compute_type}")
 
     if device == "cuda":
         print(f"GPU: {torch.cuda.get_device_name(0)}")
@@ -73,7 +114,7 @@ def process_directory(base_path, output_base_path, model_size="large-v3", timest
 
     # Load model
     print(f"\nLoading Whisper {model_size} model...")
-    model = whisper.load_model(model_size, device=device)
+    model = WhisperModel(model_size, device=device, compute_type=compute_type)
     print("Model loaded successfully!\n")
 
     # Find all media files
@@ -125,11 +166,11 @@ def process_directory(base_path, output_base_path, model_size="large-v3", timest
                 f.write(transcription)
 
             file_duration = time.time() - file_start_time
-            print(f"    ✓ Completed in {file_duration:.1f}s → {output_path}")
+            print(f"    Completed in {file_duration:.1f}s -> {output_path}")
             print(f"    Progress: {idx}/{len(media_files)} ({idx/len(media_files)*100:.1f}%)")
 
         except Exception as e:
-            print(f"    ✗ ERROR: {str(e)}")
+            print(f"    ERROR: {str(e)}")
             # Log error to file
             error_log = output_path.with_suffix('.error.txt')
             with open(error_log, 'w', encoding='utf-8') as f:
@@ -143,23 +184,26 @@ def process_directory(base_path, output_base_path, model_size="large-v3", timest
     print(f"Average time per file: {total_duration/len(media_files):.1f}s")
     print(f"{'=' * 80}")
 
+
 if __name__ == "__main__":
     # Configuration
-    MEDIA_BASE_PATH = r"C:\Users\hayat\Desktop\audio\Die_Anwaltsklausur_im_2_Staatsexamen"
-    OUTPUT_BASE_PATH = r"C:\Users\hayat\Desktop\transcript\Die_Anwaltsklausur_im_2_Staatsexamen"
+    MEDIA_BASE_PATH = r"C:\Users\hayat\Documents\Sound Recordings\tinCausa_biweekly_meeting"
+    # MEDIA_BASE_PATH = r"C:\Users\hayat\Downloads\voice_record"
+    OUTPUT_BASE_PATH = r"C:\Users\hayat\Documents\TinCausa_local\MeetingMinutes\meeting_transcript"
+    # OUTPUT_BASE_PATH = r"C:\Users\hayat\OneDrive - MCS Data Labs GmbH\law_materials\transcript_voice_record"
 
-    # Model selection for German:
-    # - "large-v3": Best quality, ~10GB VRAM (RECOMMENDED for your RTX 5090)
+    # Model selection:
+    # - "large-v3": Best quality, ~4GB VRAM with float16 (RECOMMENDED)
     # - "large-v2": Slightly older, similar quality
-    # - "medium": Faster, ~5GB VRAM, good quality
+    # - "medium": Faster, ~2GB VRAM, good quality
     # - "small": Even faster, lower quality
 
-    MODEL_SIZE = "large-v3"  # Best for German with your hardware
+    MODEL_SIZE = "large-v3"
 
     # Timestamp interval in seconds (300 = 5 minutes)
     TIMESTAMP_INTERVAL = 300
 
-    # File types to process (MP4 videos, MP3 audio, etc.)
+    # File types to process
     FILE_EXTENSIONS = ['.mp4', '.mp3', '.wav', '.m4a']
 
     # Start processing

@@ -2,7 +2,8 @@
 # Install with: pip install -r requirements.txt
 
 # OpenAI Whisper for transcription
-openai-whisper
+# openai-whisper
+faster-whisper
 
 # PyTorch with CUDA 12.1 support (for GPU acceleration)
 # Note: Install separately using the command below for proper CUDA support
@@ -18,3 +19,5 @@ ffmpeg-python>=0.2.0
 numpy>=1.23.0
 tiktoken>=0.3.0
 more-itertools>=9.0.0
+librosa 
+soundfile
