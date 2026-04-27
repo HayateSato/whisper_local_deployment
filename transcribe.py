@@ -187,10 +187,10 @@ def process_directory(base_path, output_base_path, model_size="large-v3", timest
 
 if __name__ == "__main__":
     # Configuration
-    MEDIA_BASE_PATH = r"C:\Users\hayat\Documents\Sound Recordings\tinCausa_biweekly_meeting"
-    # MEDIA_BASE_PATH = r"C:\Users\hayat\Downloads\voice_record"
-    OUTPUT_BASE_PATH = r"C:\Users\hayat\Documents\TinCausa_local\MeetingMinutes\meeting_transcript"
-    # OUTPUT_BASE_PATH = r"C:\Users\hayat\OneDrive - MCS Data Labs GmbH\law_materials\transcript_voice_record"
+    # MEDIA_BASE_PATH = r"C:\Users\hayat\Documents\Sound Recordings\KD2"  #"C:\Users\hayat\Documents\Sound Recordings\tinCausa_biweekly_meeting"
+    MEDIA_BASE_PATH = r"C:\Users\hayat\Downloads\voice_record"
+    # OUTPUT_BASE_PATH = r"C:\Users\hayat\Documents\MD2\InPerson_Meeting" #TinCausa_local\MeetingMinutes\"  #meeting_transcript"
+    OUTPUT_BASE_PATH = r"C:\Users\hayat\OneDrive - MCS Data Labs GmbH\law_materials\transcript_voice_record"
 
     # Model selection:
     # - "large-v3": Best quality, ~4GB VRAM with float16 (RECOMMENDED)

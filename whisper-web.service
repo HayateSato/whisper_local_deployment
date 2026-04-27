@@ -1,0 +1,42 @@
+[Unit]
+# systemd unit for the Whisper web tool.
+# Install:
+#   sudo cp whisper-web.service /etc/systemd/system/whisper-web.service
+#   # edit User=, WorkingDirectory= and EnvironmentFile= to match your install
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now whisper-web
+#   sudo journalctl -u whisper-web -f
+
+Description=Whisper transcription web tool
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# CHANGE THESE to match your environment.
+User=whisper
+Group=whisper
+WorkingDirectory=/opt/whisper_local_deployment
+EnvironmentFile=/opt/whisper_local_deployment/.env
+
+# Bind to localhost only — Cloudflare Tunnel reaches us via cloudflared on the same host.
+ExecStart=/opt/whisper_local_deployment/venv/bin/uvicorn server:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 1 \
+    --timeout-keep-alive 75
+
+Restart=on-failure
+RestartSec=5s
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/whisper_local_deployment /tmp
+# Whisper hits the GPU; do not block /dev access.
+
+[Install]
+WantedBy=multi-user.target

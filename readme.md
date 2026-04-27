@@ -1,4 +1,14 @@
-# Usage Instructions
+# Whisper Local Transcription
+
+Two ways to use this:
+
+- **Web tool** (FastAPI + browser frontend, single-user, exposed via Cloudflare Tunnel) —
+  see [DEPLOYMENT.md](DEPLOYMENT.md) for the Linux + Cloudflare setup walk-through.
+- **CLI batch script** (`transcribe.py`) — original tool for processing whole directories.
+
+---
+
+# CLI Usage Instructions
 
 ## 1. Install dependency:
 

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Whisper Transcription</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="app">
+        <header class="topbar">
+            <h1>Whisper Transcription</h1>
+            <div class="topbar-actions">
+                <span id="device-badge" class="badge" hidden></span>
+                <button id="logout-btn" class="link-btn" hidden>Sign out</button>
+            </div>
+        </header>
+
+        <section id="login-screen" class="card login-card" hidden>
+            <h2>Sign in</h2>
+            <p class="muted">Enter the access password.</p>
+            <form id="login-form">
+                <input type="password" id="password-input" name="password" autocomplete="current-password" placeholder="Password" required>
+                <button type="submit" class="primary">Sign in</button>
+            </form>
+            <p id="login-error" class="error-text" hidden></p>
+        </section>
+
+        <section id="app-screen" hidden>
+            <div id="banner" class="banner" hidden></div>
+
+            <div id="dropzone" class="dropzone">
+                <input type="file" id="file-input" accept=".mp3,.mp4,.wav,.m4a,audio/*,video/mp4" hidden>
+                <div class="dropzone-inner">
+                    <div class="dropzone-icon">&#x2191;</div>
+                    <p><strong>Drop an audio file here</strong> or click to browse</p>
+                    <p class="muted">Supported: .mp3 &middot; .mp4 &middot; .wav &middot; .m4a</p>
+                </div>
+            </div>
+
+            <div id="file-info" class="file-info" hidden>
+                <div>
+                    <div id="file-name" class="file-name"></div>
+                    <div id="file-meta" class="muted"></div>
+                </div>
+                <button id="clear-file" class="link-btn" type="button">Remove</button>
+            </div>
+
+            <div class="actions">
+                <button id="transcribe-btn" class="primary" disabled>Transcribe</button>
+                <button id="cancel-btn" class="ghost" hidden>Cancel</button>
+            </div>
+
+            <div id="progress-card" class="card" hidden>
+                <div class="row">
+                    <span class="label">Status</span>
+                    <span id="status-text">Idle</span>
+                </div>
+                <div class="row">
+                    <span class="label">Detected language</span>
+                    <span id="lang-text">&mdash;</span>
+                </div>
+                <div class="row">
+                    <span class="label">Audio duration</span>
+                    <span id="duration-text">&mdash;</span>
+                </div>
+                <div class="progress-wrap">
+                    <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+                    <div id="progress-label" class="progress-label">0%</div>
+                </div>
+            </div>
+
+            <div id="result-card" class="card" hidden>
+                <div class="row">
+                    <h3>Transcript</h3>
+                    <div class="result-actions">
+                        <button id="copy-btn" class="ghost" type="button">Copy</button>
+                        <button id="download-btn" class="primary" type="button">Download .txt</button>
+                    </div>
+                </div>
+                <pre id="result-text" class="result-text"></pre>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

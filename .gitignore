@@ -206,3 +206,7 @@ temp/
 .claude
 test.py
 # check_environment.py
+
+# Web tool runtime artifacts
+.env
+static/__pycache__/

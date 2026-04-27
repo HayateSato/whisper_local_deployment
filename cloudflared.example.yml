@@ -1,0 +1,32 @@
+# Cloudflare Tunnel ingress config for the Whisper web tool.
+# Place at: /etc/cloudflared/config.yml  (or ~/.cloudflared/config.yml for user-mode).
+# See DEPLOYMENT.md for the full walk-through.
+
+# Replace with the UUID printed by `cloudflared tunnel create whisper-web`.
+tunnel: REPLACE_WITH_TUNNEL_UUID
+credentials-file: /etc/cloudflared/REPLACE_WITH_TUNNEL_UUID.json
+
+# Long-running transcriptions need long timeouts. SSE streams stay open
+# for the full transcribe duration.
+originRequest:
+  connectTimeout: 30s
+  tlsTimeout: 10s
+  noTLSVerify: false
+  # Disable buffering so SSE events flush immediately.
+  disableChunkedEncoding: false
+  # Keep the connection alive while the model is working.
+  keepAliveTimeout: 90s
+  # Long ceiling for whole-request lifetime (transcription of long files).
+  # 24h covers most practical cases; tune down if you prefer.
+  http2Origin: false
+
+ingress:
+  - hostname: whisper.example.com   # CHANGE to your DNS hostname
+    service: http://127.0.0.1:8000
+    originRequest:
+      # Per-route override: SSE streams must not be timed out at the proxy.
+      # cloudflared itself will not time out an idle stream as long as
+      # heartbeats arrive (the server sends them every 15s).
+      connectTimeout: 30s
+  # Catch-all required by cloudflared.
+  - service: http_status:404

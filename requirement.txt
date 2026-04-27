@@ -19,5 +19,10 @@ ffmpeg-python>=0.2.0
 numpy>=1.23.0
 tiktoken>=0.3.0
 more-itertools>=9.0.0
-librosa 
+librosa
 soundfile
+
+# Web server (FastAPI tool)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
