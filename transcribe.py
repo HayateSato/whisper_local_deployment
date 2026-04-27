@@ -1,3 +1,16 @@
+"""
+CLI batch-transcription tool.
+
+This module is the standalone command-line tool: run it directly to walk a
+directory tree, transcribe every audio file, and write a `.txt` next to each.
+
+NOTE: The FastAPI web tool (server.py) does NOT use this module. If you are
+running the web app, ignore everything in this file — server.py loads its
+own Whisper model and handles single-file uploads via the browser.
+
+Run: python transcribe.py   (after editing the paths in __main__ below)
+"""
+
 # ============================================================
 # faster-whisper implementation (active)
 # ============================================================
@@ -9,7 +22,9 @@ from datetime import timedelta
 import time
 
 # ============================================================
-# openai-whisper implementation (commented out)
+# openai-whisper implementation (HISTORICAL — NOT USED)
+# Kept as a reference for how the original openai-whisper API looked
+# before we switched to faster-whisper. Safe to delete.
 # ============================================================
 # import whisper
 #
@@ -89,7 +104,10 @@ def transcribe_with_timestamps(model, audio_path, interval_seconds=300):
 
 def process_directory(base_path, output_base_path, model_size="large-v3", timestamp_interval=300, file_extensions=None):
     """
-    Process all audio/video files in directory structure
+    Process all audio/video files in a directory tree (CLI bulk mode).
+
+    Used only by the CLI entry-point below. The web app (server.py) handles
+    one file at a time via HTTP upload and does not call this function.
 
     Args:
         base_path: Root directory containing section folders with media files
@@ -185,8 +203,18 @@ def process_directory(base_path, output_base_path, model_size="large-v3", timest
     print(f"{'=' * 80}")
 
 
+# ============================================================
+# CLI / MANUAL-RUN BLOCK
+#
+# Everything below is ONLY for running this file directly from the command
+# line (`python transcribe.py`) to bulk-transcribe a directory on the local
+# machine. If you are running the web app (server.py / uvicorn), this block
+# is never executed — ignore the hard-coded paths and config below.
+#
+# To use: edit MEDIA_BASE_PATH and OUTPUT_BASE_PATH to match your machine.
+# ============================================================
 if __name__ == "__main__":
-    # Configuration
+    # Configuration — local paths for manual/CLI use only.
     # MEDIA_BASE_PATH = r"C:\Users\hayat\Documents\Sound Recordings\KD2"  #"C:\Users\hayat\Documents\Sound Recordings\tinCausa_biweekly_meeting"
     MEDIA_BASE_PATH = r"C:\Users\hayat\Downloads\voice_record"
     # OUTPUT_BASE_PATH = r"C:\Users\hayat\Documents\MD2\InPerson_Meeting" #TinCausa_local\MeetingMinutes\"  #meeting_transcript"
