@@ -34,7 +34,7 @@ A drag-and-drop UI with live progress, detected language, and a one-click `.txt`
 pip install -r requirement.txt
 
 # Linux / macOS
-export WHISPER_PASSWORD=test
+export WHISPER_PASSWORD=Transcribe123
 export WHISPER_SECRET_KEY=$(python -c "import secrets;print(secrets.token_hex(32))")
 export WHISPER_COOKIE_SECURE=false   # only for plain-HTTP local testing
 uvicorn server:app --host 127.0.0.1 --port 8000
@@ -42,17 +42,19 @@ uvicorn server:app --host 127.0.0.1 --port 8000
 
 ```powershell
 # Windows (PowerShell)
-$env:WHISPER_PASSWORD = "test"
+$env:WHISPER_PASSWORD = "Transcribe123"
 $env:WHISPER_SECRET_KEY = (python -c "import secrets;print(secrets.token_hex(32))")
 $env:WHISPER_COOKIE_SECURE = "false"
 uvicorn server:app --host 127.0.0.1 --port 8000
 ```
 
-Open <http://127.0.0.1:8000>, sign in with `test`, drop a file.
+Open <http://127.0.0.1:8000>, sign in with `Transcribe123`, drop a file.
 
 ### Production deployment (Linux + Cloudflare Tunnel)
 
 The full walk-through — host prereqs, systemd, cloudflared, DNS, Cloudflare Access (recommended for email-gated colleague access), and the Cloudflare 100 MB body cap — lives in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+**Don't have a paid Cloudflare account?** See **[CLOUDFLARE_FREE.md](CLOUDFLARE_FREE.md)** — it covers the secure free-plan setup (Tunnel + Access + WAF rules) with no security trade-offs except the 100 MB upload cap, plus pre-compression workarounds.
 
 Short version:
 
@@ -113,7 +115,7 @@ choco install ffmpeg -y
 .\setup_environment.ps1     # or setup_environment.bat
 
 # 3. Sanity check
-python check_environment.py
+python scripts\check_environment.py
 ```
 
 ### Linux setup
@@ -201,8 +203,9 @@ If `False`: reinstall PyTorch with the CUDA wheel index — `pip install torch t
 │   ├── app.js
 │   └── style.css
 ├── transcribe.py              # CLI batch script
-├── check_environment.py       # GPU/CUDA/ffmpeg/PyTorch sanity report
-├── check_cuda.py              # one-liner CUDA visibility check
+├── scripts/                   # diagnostic / dev scripts
+│   ├── check_environment.py   # GPU/CUDA/ffmpeg/PyTorch sanity report
+│   └── check_cuda.py          # one-liner CUDA visibility check
 ├── requirement.txt            # Python deps (faster-whisper, FastAPI, ...)
 ├── setup_environment.ps1      # Windows venv setup
 ├── setup_environment.bat      # Windows venv setup (cmd)
@@ -210,5 +213,6 @@ If `False`: reinstall PyTorch with the CUDA wheel index — `pip install torch t
 ├── whisper-web.service        # systemd unit for the web tool
 ├── cloudflared.example.yml    # Cloudflare Tunnel ingress template
 ├── .env.example               # web-tool config template
-└── DEPLOYMENT.md              # full Linux + Cloudflare deployment guide
+├── DEPLOYMENT.md              # full Linux + Cloudflare deployment guide
+└── CLOUDFLARE_FREE.md         # secure free-plan Cloudflare setup
 ```

@@ -16,7 +16,7 @@ pip install openai-whisper ffmpeg-python
 Write-Host ""
 
 Write-Host "Step 4: Verifying installation..." -ForegroundColor Yellow
-python check_environment.py
+python scripts\check_environment.py
 Write-Host ""
 
 Write-Host "============================================" -ForegroundColor Green

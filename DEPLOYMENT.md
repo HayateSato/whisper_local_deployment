@@ -165,13 +165,17 @@ Open `https://whisper.example.com` in a browser. You should hit the sign-in scre
 
 Protect the tool with a one-time PIN to your colleague's email **on top of** the app password.
 Anyone reaching the URL must pass Cloudflare's auth before the request even gets to your host.
+Free plan covers up to 50 users.
+
+For a step-by-step screen-by-screen walk-through (plus extra free hardening — Bot Fight
+Mode, WAF country block, login rate-limit), see **[CLOUDFLARE_FREE.md](CLOUDFLARE_FREE.md)**.
+
+Quick version:
 
 1. Cloudflare dashboard → **Zero Trust** → **Access** → **Applications** → **Add an application** → **Self-hosted**.
 2. Application domain: `whisper.example.com`.
 3. Add a policy: **Action: Allow**, **Include**: Emails → your colleague's address.
 4. Save. The app is now behind Cloudflare login.
-
-Free plan covers up to 50 users.
 
 ---
 

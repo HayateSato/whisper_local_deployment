@@ -17,7 +17,7 @@ pip install openai-whisper ffmpeg-python
 echo.
 
 echo Step 4: Verifying installation...
-python check_environment.py
+python scripts\check_environment.py
 echo.
 
 echo ============================================

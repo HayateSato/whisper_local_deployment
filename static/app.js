@@ -313,9 +313,7 @@
                     }
                 } else if (event === 'progress') {
                     setProgress(data.percent);
-                    if (data.current_seconds && data.total_seconds) {
-                        statusText.textContent = `Transcribing… ${formatDuration(data.current_seconds)} / ${formatDuration(data.total_seconds)}`;
-                    }
+                    statusText.textContent = 'Transcribing…';
                 } else if (event === 'complete') {
                     setProgress(100);
                     statusText.textContent = 'Done';
