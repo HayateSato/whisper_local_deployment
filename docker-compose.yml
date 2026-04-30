@@ -1,0 +1,64 @@
+# Whisper Web — Docker Compose stack.
+#
+# Default (just the app, port-bound to localhost):
+#   docker compose up -d
+#
+# With Cloudflare Tunnel sidecar (publishes the app to your public hostname):
+#   docker compose --profile tunnel up -d
+#
+# See DOCKER.md for the full walk-through (host prereqs, GPU access, first-run
+# model download, etc.).
+
+services:
+  whisper-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: whisper-web:latest
+    container_name: whisper-web
+    restart: unless-stopped
+    env_file:
+      - .env
+    # Bind to the host's loopback only — Cloudflare Tunnel reaches us via the
+    # cloudflared sidecar on the same compose network, not from outside.
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      # Persist the Whisper model cache across container restarts so we don't
+      # re-download large-v3 every time. ~3 GB for large-v3.
+      - whisper-models:/cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: ["gpu"]
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health',timeout=3).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s   # large-v3 first load takes a while
+
+  # Cloudflare Tunnel sidecar (optional).
+  # Enable with:  docker compose --profile tunnel up -d
+  # Auth method: token-based (simplest). Generate a tunnel + token in the
+  # Cloudflare Zero Trust dashboard, paste it into .env as CLOUDFLARE_TUNNEL_TOKEN.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: whisper-cloudflared
+    restart: unless-stopped
+    profiles: ["tunnel"]
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      whisper-web:
+        condition: service_healthy
+    # The sidecar reaches the app over the compose network at
+    # http://whisper-web:8000 — set the same value as the public hostname's
+    # service URL when configuring the tunnel in the Cloudflare dashboard.
+
+volumes:
+  whisper-models:
+    name: whisper-models

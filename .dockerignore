@@ -1,0 +1,53 @@
+# Anything not needed at runtime should not enter the build context.
+
+# VCS
+.git
+.gitignore
+.github
+
+# Local Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# IDE / editor
+.vscode/
+.idea/
+.claude/
+
+# Local-only artifacts
+.env
+*.log
+
+# Docs (not used by the app at runtime)
+*.md
+DEPLOYMENT.md
+DOCKER.md
+CLOUDFLARE_FREE.md
+readme.md
+
+# CLI / setup scripts (the container uses uvicorn directly)
+setup_environment.bat
+setup_environment.ps1
+setup_linux.sh
+whisper-web.service
+cloudflared.example.yml
+scripts/
+test.py
+transcribe.py
+check_cuda.py
+check_environment.py
+
+# OS detritus
+.DS_Store
+Thumbs.db
+
+# Docker artifacts (avoid recursive copies if rebuilding nearby)
+Dockerfile
+docker-compose.yml
+.dockerignore

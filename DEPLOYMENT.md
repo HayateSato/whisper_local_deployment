@@ -1,10 +1,14 @@
-# Deployment — Linux + Cloudflare Tunnel
+# Deployment — Linux + Cloudflare Tunnel (bare-metal)
 
 End-to-end guide for deploying the Whisper web tool on a company Linux PC and exposing it
 publicly to a single colleague via Cloudflare Tunnel.
 
 The host stays on the company LAN. Cloudflared opens an outbound tunnel to Cloudflare's
 edge — no inbound ports, no firewall changes, no public IP.
+
+> **Looking for the recommended path?** Use **Docker** instead — see **[DOCKER.md](DOCKER.md)**.
+> The container bundles PyTorch+CUDA, ffmpeg, and the app, so you avoid the venv +
+> systemd dance below. Keep reading only if Docker is not available on the host.
 
 ---
 

@@ -50,9 +50,12 @@ uvicorn server:app --host 127.0.0.1 --port 8000
 
 Open <http://127.0.0.1:8000>, sign in with `Transcribe123`, drop a file.
 
-### Production deployment (Linux + Cloudflare Tunnel)
+### Production deployment
 
-The full walk-through — host prereqs, systemd, cloudflared, DNS, Cloudflare Access (recommended for email-gated colleague access), and the Cloudflare 100 MB body cap — lives in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+Two paths, both supported:
+
+- **Docker (recommended)** — single image bundles PyTorch+CUDA, faster-whisper, ffmpeg, the FastAPI app, and the frontend. Lift it to any Linux host with an NVIDIA GPU. See **[DOCKER.md](DOCKER.md)** for host prereqs (NVIDIA Container Toolkit), build/run, GPU verification, and the optional `cloudflared` sidecar.
+- **Bare-metal** (venv + systemd) — if Docker isn't an option on the host. See **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 **Don't have a paid Cloudflare account?** See **[CLOUDFLARE_FREE.md](CLOUDFLARE_FREE.md)** — it covers the secure free-plan setup (Tunnel + Access + WAF rules) with no security trade-offs except the 100 MB upload cap, plus pre-compression workarounds.
 
@@ -207,12 +210,16 @@ If `False`: reinstall PyTorch with the CUDA wheel index — `pip install torch t
 │   ├── check_environment.py   # GPU/CUDA/ffmpeg/PyTorch sanity report
 │   └── check_cuda.py          # one-liner CUDA visibility check
 ├── requirement.txt            # Python deps (faster-whisper, FastAPI, ...)
-├── setup_environment.ps1      # Windows venv setup
+├── Dockerfile                 # CUDA + ffmpeg + app image
+├── docker-compose.yml         # web app + optional cloudflared sidecar
+├── .dockerignore
+├── setup_environment.ps1      # Windows venv setup (bare-metal path)
 ├── setup_environment.bat      # Windows venv setup (cmd)
-├── setup_linux.sh             # Linux venv setup
-├── whisper-web.service        # systemd unit for the web tool
-├── cloudflared.example.yml    # Cloudflare Tunnel ingress template
+├── setup_linux.sh             # Linux venv setup (bare-metal path)
+├── whisper-web.service        # systemd unit for the web tool (bare-metal path)
+├── cloudflared.example.yml    # Cloudflared ingress template (bare-metal path)
 ├── .env.example               # web-tool config template
-├── DEPLOYMENT.md              # full Linux + Cloudflare deployment guide
+├── DOCKER.md                  # Docker deployment guide (recommended)
+├── DEPLOYMENT.md              # bare-metal Linux deployment guide
 └── CLOUDFLARE_FREE.md         # secure free-plan Cloudflare setup
 ```
